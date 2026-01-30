@@ -1,4 +1,5 @@
 import random
+import parse_data
 
 def break_wall(grid, x1, y1, x2, y2):
     dx = x2 - x1
@@ -50,3 +51,46 @@ def unlock_maze(maze):
             stack.pop()
     
     return grid
+
+def export_maze(config, grid, path_string=""):
+    output_file = config.get("OUTPUT_FILE", "maze.txt")
+    
+    with open(output_file, "w") as f:
+        # Phase 1: The Hex Grid
+        for row in grid:
+            # Join all hex characters into one string per row
+            hex_row = "".join([format(cell, 'x').upper() for cell in row])
+            f.write(hex_row + "\n")
+        
+        f.write("\n")
+        
+        # Phase 3: Entry and Exit
+        entry = config["ENTRY"]
+        exit_ = config["EXIT"]
+        f.write(f"{entry[0]},{entry[1]}\n")
+        f.write(f"{exit_[0]},{exit_[1]}\n")
+        
+        # Phase 4: The Path (The NNEESW string)
+        f.write(path_string + "\n")
+    
+    print(f"Successfully exported maze to {output_file}")
+
+if __name__ == "__main__":
+    CONFIG_FILE = "test.txt"
+    
+    print(f"--- Step 1: Parsing {CONFIG_FILE} ---")
+    config = parse_data.read_map(CONFIG_FILE)
+    
+    # 3. Validate the configuration
+    if config and parse_data.validate_config(config):
+        print("Config Validated.")
+        
+        print(f"--- Step 2: Generating {config['WIDTH']}x{config['HEIGHT']} Maze ---")
+        final_grid = unlock_maze(config) 
+        
+        print(f"--- Step 3: Exporting to {config.get('OUTPUT_FILE')} ---")
+        export_maze(config, final_grid, path_string="PATH_PENDING_BFS")
+        
+        print("\nthe output file is created")
+    else:
+        print("Error: Maze generation aborted due to invalid config.")

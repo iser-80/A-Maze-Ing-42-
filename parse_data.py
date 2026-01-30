@@ -46,7 +46,7 @@ def validate_config(config):
             print("Error: invalid entry, must be in range of width in height")
             return False
     
-        if not (0 <= exit_x <= width and 0 <= exit_y <= height):
+        if not (0 <= exit_x < width and 0 <= exit_y <= height):
             print("Error: invalid exit, must be in range of width in height")
             return False
     
@@ -62,10 +62,3 @@ def validate_config(config):
     except Exception as e:
         print(f"An unexpected error occured: {e}")
         return None
-
-
-# TESTING
-test = read_map("test.txt")
-if validate_config(test):
-    print(test)
-    
