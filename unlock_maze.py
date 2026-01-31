@@ -56,24 +56,17 @@ def export_maze(config, grid, path_string=""):
     output_file = config.get("OUTPUT_FILE", "maze.txt")
     
     with open(output_file, "w") as f:
-        # Phase 1: The Hex Grid
-        for row in grid:
-            # Join all hex characters into one string per row
-            hex_row = "".join([format(cell, 'x').upper() for cell in row])
-            f.write(hex_row + "\n")
-        
+        f.write(str(grid) + "\n")
         f.write("\n")
         
-        # Phase 3: Entry and Exit
         entry = config["ENTRY"]
         exit_ = config["EXIT"]
         f.write(f"{entry[0]},{entry[1]}\n")
         f.write(f"{exit_[0]},{exit_[1]}\n")
         
-        # Phase 4: The Path (The NNEESW string)
         f.write(path_string + "\n")
     
-    print(f"Successfully exported maze to {output_file}")
+    print(f"Successfully exported maze data to {output_file}")
 
 if __name__ == "__main__":
     CONFIG_FILE = "test.txt"
