@@ -52,6 +52,51 @@ def unlock_maze(maze):
     
     return grid
 
+
+from collections import deque
+
+def solve_maze(grid, entry, exit_node):
+    width = len(grid[0])
+    height = len(grid)
+    start = tuple(entry)
+    end = tuple(exit_node)
+    
+    queue = deque([start])
+    parents = {start: None}
+
+    directions = [
+        (0, -1, 'N', 1),
+        (1, 0, 'E', 2),
+        (0, 1, 'S', 4),
+        (-1, 0, 'W', 8)
+    ]
+
+    while queue:
+        curr_x, curr_y = queue.popleft()
+
+        if (curr_x, curr_y) == end:
+            return reconstruct_path(parents, start, end)
+
+        for dx, dy, label, bit in directions:
+            nx, ny = curr_x + dx, curr_y + dy
+
+            if 0 <= nx < width and 0 <= ny < height:
+                if not (grid[curr_y][curr_x] & bit) and (nx, ny) not in parents:
+                    parents[(nx, ny)] = (curr_x, curr_y, label)
+                    queue.append((nx, ny))
+
+    return "PATH_NOT_FOUND"
+
+def reconstruct_path(parents, start, end):
+    path = []
+    curr = end
+    while curr != start:
+        prev_x, prev_y, label = parents[curr]
+        path.append(label)
+        curr = (prev_x, prev_y)
+    
+    return "".join(reversed(path))
+
 def export_maze(config, grid, path_string=""):
     output_file = config.get("OUTPUT_FILE", "maze.txt")
     
@@ -74,16 +119,18 @@ if __name__ == "__main__":
     print(f"--- Step 1: Parsing {CONFIG_FILE} ---")
     config = parse_data.read_map(CONFIG_FILE)
     
-    # 3. Validate the configuration
     if config and parse_data.validate_config(config):
         print("Config Validated.")
         
         print(f"--- Step 2: Generating {config['WIDTH']}x{config['HEIGHT']} Maze ---")
         final_grid = unlock_maze(config) 
         
-        print(f"--- Step 3: Exporting to {config.get('OUTPUT_FILE')} ---")
-        export_maze(config, final_grid, path_string="PATH_PENDING_BFS")
+        print("--- Step 3: Solving Maze (BFS) ---")
+        path_string = solve_maze(final_grid, config['ENTRY'], config['EXIT'])
         
-        print("\nthe output file is created")
+        print(f"--- Step 4: Exporting to {config.get('OUTPUT_FILE')} ---")
+        export_maze(config, final_grid, path_string)
+        
+        print("\nSuccess! The output file contains the grid and the path.")
     else:
         print("Error: Maze generation aborted due to invalid config.")
