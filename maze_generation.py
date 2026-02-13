@@ -3,8 +3,8 @@ import Parsing
 
 
 def break_wall(grid, x1, y1, x2, y2):
-	dx = x1 - x2
-	dy = y1 - y2
+	dx = x2 - x1
+	dy = y2 - y1
 
 	if dy == -1:
 		grid[y1][x1] -= 1
@@ -21,8 +21,8 @@ def break_wall(grid, x1, y1, x2, y2):
 
 def generate_maze(maze):
 	try:
-		width = maze["WIDTH"]
-		height = maze["HEIGHT"]
+		width = int(maze["WIDTH"])
+		height = int(maze["HEIGHT"])
 		x, y = maze["ENTRY"]
 
 		stack = [(x, y)]
@@ -40,13 +40,13 @@ def generate_maze(maze):
 			unvisited_cells = []
 			current_x, current_y = stack[-1]
 			
-			for dir_x, dir_y in directions:
+			for dir_x, dir_y, bit in directions:
 				nx_x, nx_y = current_x + dir_x, current_y + dir_y
-				if 0 < nx_x <= width and 0 < nx_y <= height and (nx_x, nx_y) not in visited:
-					unvisited_cells.append((nx_x, nx_y, dir_x, dir_y))
+				if 0 <= nx_x < width and 0 <= nx_y < height and (nx_x, nx_y) not in visited:
+					unvisited_cells.append((nx_x, nx_y, bit))
 			
 			if unvisited_cells:
-				nx_x, nx_y, dir_x, dir_y = random.choice(unvisited_cells)
+				nx_x, nx_y, bit = random.choice(unvisited_cells)
 
 				break_wall(grid, current_x, current_y, nx_x, nx_y)
 				visited.add((nx_x, nx_y))
