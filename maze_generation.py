@@ -83,31 +83,31 @@ def generate_42_seed(maze, grid, visited):
         width = int(maze["WIDTH"])
         height = int(maze["HEIGHT"])
 
-        #if width >= 18 and height >= 15:
-        ox = (width - 7) // 2
-        oy = (height - 5) // 2
+        if width >= 18 and height >= 15:
+            ox = (width - 7) // 2
+            oy = (height - 5) // 2
 
-        segments = [
-            # The "4"
-            (0,0, 0,1), (0,1, 0,2),
-            (0,2, 1,2), (1,2, 2,2),
-            (2,0, 2,1), (2,1, 2,2), (2,2, 2,3), (2,2, 2,4),
-            
-            # The "2"
-            (4,0, 5,0), (5,0, 6,0),
-            (6,0, 6,1), (6,1, 6,2),
-            (6,2, 5,2), (5,2, 4,2),
-            (4,2, 4,3), (4,3, 4,4),
-            (4,4, 5,4), (5,4, 6,4)
-        ]
+            segments = [
+                # The "4"
+                (0,0, 0,1), (0,1, 0,2),
+                (0,2, 1,2), (1,2, 2,2),
+                (2,2, 2,3), (2,2, 2,4),
+                
+                # The "2"
+                (4,0, 5,0), (5,0, 6,0),
+                (6,0, 6,1), (6,1, 6,2),
+                (6,2, 5,2), (5,2, 4,2),
+                (4,2, 4,3), (4,3, 4,4),
+                (4,4, 5,4), (5,4, 6,4)
+            ]
 
-        for x1, y1, x2, y2 in segments:
-            rx1, ry1 = x1 + ox, y1 + oy
-            rx2, ry2 = x2 + ox, y2 + oy
-            
-            break_wall(grid, rx1, ry1, rx2, ry2)
-            visited.add((rx1, ry1))
-            visited.add((rx2, ry2))
+            for x1, y1, x2, y2 in segments:
+                rx1, ry1 = x1 + ox, y1 + oy
+                rx2, ry2 = x2 + ox, y2 + oy
+                
+                #break_wall(grid, rx1, ry1, rx2, ry2)
+                visited.add((rx1, ry1))
+                visited.add((rx2, ry2))
 
 
     except Exception as e:

@@ -45,12 +45,34 @@ def reconstruct_path(paths, start, end):
 	return "".join(reversed(path_letter))
 
 
+# TESTING
+def debug_draw_maze(grid):
+    width = len(grid[0])
+    # Print top border
+    print("+" + "---+" * width)
+    
+    for row in grid:
+        # 1. Print the horizontal paths (West/East)
+        row_str = "|"
+        for cell in row:
+            # If bit 2 (EAST) is NOT set, there is a path (space)
+            # If it IS set, there is a wall (|)
+            wall = " " if not (cell & 2) else "|"
+            row_str += "   " + wall
+        print(row_str)
+        
+        # 2. Print the vertical paths (North/South)
+        bottom_str = "+"
+        for cell in row:
+            # If bit 4 (SOUTH) is NOT set, there is a path (space)
+            wall = "   " if not (cell & 4) else "---"
+            bottom_str += wall + "+"
+        print(bottom_str)
+
 if __name__ == "__main__":
-	config = parsing.parse_data("test.txt")
-
-	if config and parsing.validate_config_data(config):
-		grid = maze_generation.generate_maze(config)
-		path = solve_maze(grid, config["ENTRY"], config["EXIT"])
-
-	print(path)
-
+    config = parsing.parse_data("test.txt")
+    if config:
+        grid = maze_generation.generate_maze(config)
+        
+        print("\n--- DEBUG MAZE VIEW ---")
+        debug_draw_maze(grid)
