@@ -1,6 +1,7 @@
-from collections import deque
-
 import parsing
+import maze_generation
+
+from collections import deque
 
 
 def solve_maze(grid, entry, exit):
@@ -30,7 +31,7 @@ def solve_maze(grid, entry, exit):
 					paths[(nx_x, nx_y)] = ((cur_x, cur_y), char)
 					queue.append((nx_x, nx_y))
 
-		return "path not found"
+	return "path not found"
 
 def reconstruct_path(paths, start, end):
 	current = end
@@ -42,3 +43,14 @@ def reconstruct_path(paths, start, end):
 		current = (prev_x, prev_y)
 
 	return "".join(reversed(path_letter))
+
+
+if __name__ == "__main__":
+	config = parsing.parse_data("test.txt")
+
+	if config and parsing.validate_config_data(config):
+		grid = maze_generation.generate_maze(config)
+		path = solve_maze(grid, config["ENTRY"], config["EXIT"])
+
+	print(path)
+

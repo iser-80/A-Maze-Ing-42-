@@ -1,8 +1,7 @@
-WIDTH=10
-
+WIDTH=23
 HEIGHT=10
 ENTRY=0,0
-EXIT=9,9
+EXIT=1,3
 OUTPUT_FILE=my_generated_maze.txt
 PERFECT=True
 
