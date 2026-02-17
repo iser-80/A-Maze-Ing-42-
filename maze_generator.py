@@ -1,11 +1,13 @@
 import random
 from collections import deque
+import time
 
 class MazeGenerator:
     def __init__(self, width, height, entry, exitt, is_perfect, seed):
         self.width = width
         self.height = height
         self.entry = entry
+        self.blocked = set()
         #fixd exit
         if isinstance(exitt, str):
             self.exitt = [int(x) for x in exitt.split(",")]
@@ -45,10 +47,18 @@ class MazeGenerator:
 
                 segments = [
                     # The "4"
-                    (0,0, 0,1), (0,1, 0,2),
-                    (0,2, 1,2), (1,2, 2,2),
-                    (2,2, 2,3), (2,2, 2,4),
-                    
+                    # (0,0, 0,1), (0,1, 0,2),
+                    # (0,2, 1,2), (1,2, 2,2),
+                    # (2,2, 2,3), (2,2, 2,4),
+                    #fixed wrong 4
+                    (0,0, 0,1),
+                    (0,1, 0,2),
+                    (2,0, 2,1),
+                    (2,1, 2,2),
+                    (2,2, 2,3),
+                    (2,3, 2,4),
+                    (0,2, 1,2),
+                    (1,2, 2,2),
                     # The "2"
                     (4,0, 5,0), (5,0, 6,0),
                     (6,0, 6,1), (6,1, 6,2),
@@ -56,18 +66,18 @@ class MazeGenerator:
                     (4,2, 4,3), (4,3, 4,4),
                     (4,4, 5,4), (5,4, 6,4)
                 ]
-
+                
                 for x1, y1, x2, y2 in segments:
                     rx1, ry1 = x1 + ox, y1 + oy
                     rx2, ry2 = x2 + ox, y2 + oy
                     
-                    # self.break_wall(rx1, ry1, rx2, ry2)
-                    self.visited.add((rx1, ry1))
-                    self.visited.add((rx2, ry2))
+                    self.break_wall(rx1, ry1, rx2, ry2)
+                    self.blocked.add((rx1, ry1))
+                    self.blocked.add((rx2, ry2))
         except Exception as e:
             print(f"Error: An unexpected error occured {e}")
 
-    def generate_maze(self):
+    def generate_maze(self, maze = None, animate = False):
         try:
             #now the maze can regenerate
             self.visited = set()
@@ -84,7 +94,7 @@ class MazeGenerator:
             self.visited.add((x, y))
             self.generate_42_seed()
             #the same seed can generate the same maze
-            if self.seed:
+            if self.seed is not None:
                 random.seed(int(self.seed))
             else:
                 random.seed()
@@ -93,11 +103,19 @@ class MazeGenerator:
                 current_x, current_y = stack[-1]
                 for dir_x, dir_y, bit in directions:
                     nx_x, nx_y = current_x + dir_x, current_y + dir_y
-                    if 0 <= nx_x < self.width and 0 <= nx_y < self.height and (nx_x, nx_y) not in self.visited:
+                    # if 0 <= nx_x < self.width and 0 <= nx_y < self.height and (nx_x, nx_y) not in self.visited:
+                    if (0 <= nx_x < self.width and
+                        0 <= nx_y < self.height and
+                        (nx_x, nx_y) not in self.visited and
+                        (nx_x, nx_y) not in self.blocked):
                         unvisited_cells.append((nx_x, nx_y, bit))
                 if unvisited_cells:
                     nx_x, nx_y, bit = random.choice(unvisited_cells)
                     self.break_wall(current_x, current_y, nx_x, nx_y)
+                    if animate and maze:
+                        maze.grid = self.grid
+                        maze.display()
+                        time.sleep(0.01)
                     self.visited.add((nx_x, nx_y))
                     stack.append((nx_x, nx_y))
                 else:

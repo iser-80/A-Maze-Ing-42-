@@ -44,8 +44,10 @@ class Maze:
             '\033[36m',
             '\033[37m',
         ]
+        BLOCK = "▒"
         RESET = '\033[0m'
-        PATH_COLOR = '\033[35m'
+        PATTERN_COLOR = '\033[1;93m'
+        PATH_COLOR = '\033[96m'
 
         if color_mode == 0:
             wall_color = '\033[37m'
@@ -57,7 +59,8 @@ class Maze:
         else:
             wall_color = '\033[34m'
 
-        WALL = f"{wall_color}██{RESET}"
+        WALL = f"{wall_color}{BLOCK * 2}{RESET}"
+        # SPACE = f"\033[30m{BLOCK}{RESET}"
         SPACE = "  "
         path_cells = set()
         if show_path and self.solution_path:
@@ -73,7 +76,7 @@ class Maze:
                 elif move == 'W':
                     cx -= 1
                 path_cells.add((cx, cy))
-        sys.stdout.write("\033[H\033[J")
+        sys.stdout.write("\033[H")
         canvas_height = self.height * 2 + 1
         canvas_width = self.width * 2 + 1
 
@@ -84,8 +87,10 @@ class Maze:
                 cy = y * 2 + 1
                 cx = x * 2 + 1
 
-                if (x, y) in path_cells:
-                    canvas[cy][cx] = f"{PATH_COLOR}██{RESET}"
+                if hasattr(self, "pattern_42") and (x, y) in self.pattern_42:
+                    canvas[cy][cx] = f"{PATTERN_COLOR}{BLOCK * 2}{RESET}"
+                elif (x, y) in path_cells:
+                    canvas[cy][cx] = f"{PATH_COLOR}{BLOCK * 2}{RESET}"
                 else:
                     canvas[cy][cx] = SPACE
 
@@ -135,10 +140,11 @@ if __name__ == "__main__":
         maze.entry,
         maze.config.get("EXIT", f"{maze.width - 1}, {maze.height - 1}"),
         True,
-        maze.config.get("SEED", 0)
+        maze.config.get("SEED", None)
     )
-    generator.generate_maze()
+    generator.generate_maze(maze=maze, animate=True)
     maze.grid = generator.grid
+    maze.pattern_42 = generator.blocked
     maze.solution_path = generator.solve_maze()
     maze.display()
     color_mode = 0
@@ -152,8 +158,9 @@ if __name__ == "__main__":
         choice = int(input("Choice? (1-5):"))
         if choice == 1:
             # maze.grid = MazeGenerator.generate_maze(config)
-            generator.generate_maze()
+            generator.generate_maze(maze=maze, animate=True)
             maze.grid = generator.grid
+            maze.pattern_42 = generator.blocked
             maze.solution_path = generator.solve_maze()
             maze.display(show_path=show_path, color_mode=color_mode)
         elif choice == 2:
