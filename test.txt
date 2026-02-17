@@ -1,7 +1,0 @@
-WIDTH=20
-HEIGHT=25
-ENTRY=0,0
-EXIT=6,6
-OUTPUT_FILE=my_generated_maze.txt
-PERFECT=True
-SEED=42

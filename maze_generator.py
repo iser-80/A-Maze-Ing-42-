@@ -94,7 +94,7 @@ class MazeGenerator:
             self.visited.add((x, y))
             self.generate_42_seed()
             #the same seed can generate the same maze
-            if self.seed is not None:
+            if self.seed is not None or self.seed == "":
                 random.seed(int(self.seed))
             else:
                 random.seed()
