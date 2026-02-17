@@ -1,6 +1,8 @@
 import time
 import os
 import sys
+from maze_generator import MazeGenerator
+
 
 def parsing(file_name):
     if not os.path.isfile(file_name):
@@ -16,8 +18,11 @@ def parsing(file_name):
                 key, value = line.split('=', 1)
                 config[key.strip()] = value.strip()
     return config
+
+
 class Maze:
     N, E, S, W = 1, 2, 4, 8
+
     def __init__(self, config):
         self.config = config
         self.solution_path = ""
@@ -29,7 +34,7 @@ class Maze:
                      for _ in range(self.height)]
         print(f"Maze created {self.width}x{self.height}")
 
-    def display(self, show_path = False, color_mode = 0):
+    def display(self, show_path=False, color_mode=0):
         colors = [
             '\033[31m',
             '\033[32m',
@@ -59,7 +64,7 @@ class Maze:
             cx, cy = self.entry
             path_cells.add((cx, cy))
             for move in self.solution_path:
-                if move == 'N': 
+                if move == 'N':
                     cy -= 1
                 elif move == 'S':
                     cy += 1
@@ -79,7 +84,7 @@ class Maze:
                 cy = y * 2 + 1
                 cx = x * 2 + 1
 
-                if (x,y) in path_cells:
+                if (x, y) in path_cells:
                     canvas[cy][cx] = f"{PATH_COLOR}██{RESET}"
                 else:
                     canvas[cy][cx] = SPACE
@@ -97,24 +102,28 @@ class Maze:
         for row in canvas:
             print("".join(row))
         sys.stdout.flush()
+
     def save_into_file(self):
         file_name = self.config.get("OUTPUT_FILE", "maze.txt")
 
         try:
             with open(file_name, "w") as f:
                 for row in self.grid:
-                    f.write("".join(hex(cell)[2:].upper() for cell in row) + "\n")
+                    f.write("".join(hex(cell)[2:].upper()
+                                    for cell in row) + "\n")
                 f.write("\n")
 
-                f.write(f"{self.entry[0]}, {self.entry[1]}\n")
-                exitv = self.config.get("EXIT", f"{self.width - 1}, {self.height -1}")
+                f.write(f"{self.entry[0]}"
+                        f" {self.entry[1]}\n")
+                exitv = self.config.get("EXIT", f"{self.width - 1}"
+                                        f" {self.height - 1}")
                 f.write(f"{exitv}\n")
                 solution = getattr(self, "solution_path", "")
                 f.write(f"{solution}\n")
         except Exception as e:
             print(f"Error saving file: {e}")
-# from solve_maze import s
-from maze_generator import MazeGenerator
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("please add the config file")
@@ -122,33 +131,45 @@ if __name__ == "__main__":
     config = parsing(sys.argv[1])
     maze = Maze(config)
     generator = MazeGenerator(
-        maze.width,maze.height,
-        maze.entry,maze.config.get("EXIT", f"{maze.width - 1}, {maze.height -1}"),
+        maze.width, maze.height,
+        maze.entry,
+        maze.config.get("EXIT", f"{maze.width - 1}, {maze.height - 1}"),
         True,
-        42
+        maze.config.get("SEED", 0)
     )
     generator.generate_maze()
     maze.grid = generator.grid
     maze.solution_path = generator.solve_maze()
-    print(maze.solution_path)
+    maze.display()
     color_mode = 0
     show_path = False
     while True:
         print("1 . Re-generatre a new maze")
         print("2 . SHOW/HIDE path from entry to exit")
         print("3 . Rotate maze colors")
-        print("4 . Quit")
-        choice = int(input("Choice? (1-4):"))
+        print("4 . Save maze")
+        print("5. Quit")
+        choice = int(input("Choice? (1-5):"))
         if choice == 1:
             # maze.grid = MazeGenerator.generate_maze(config)
-            maze.display(color_mode = 0)
+            generator.generate_maze()
+            maze.grid = generator.grid
+            maze.solution_path = generator.solve_maze()
+            maze.display(show_path=show_path, color_mode=color_mode)
         elif choice == 2:
-            
             show_path = not show_path
-            maze.display(show_path, color_mode)
+            maze.display(show_path=show_path, color_mode=color_mode)
         elif choice == 3:
-            maze.display(color_mode = 1)
+            color_mode = (color_mode + 1) % 3
+            maze.display(show_path=show_path, color_mode=color_mode)
         elif choice == 4:
+            try:
+                maze.save_into_file()
+                sys.stdout.write("\033[H\033[J")
+                print("Maze saved seccufuly")
+            except Exception as e:
+                print(f"the maze did not save succusfuly, ERROR {e}")
+        elif choice == 5:
             sys.exit(0)
 
     # myconfig = parsing(config)

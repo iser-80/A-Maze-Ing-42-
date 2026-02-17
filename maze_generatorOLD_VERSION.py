@@ -6,17 +6,12 @@ class MazeGenerator:
         self.width = width
         self.height = height
         self.entry = entry
-        #fixd exit
-        if isinstance(exitt, str):
-            self.exitt = [int(x) for x in exitt.split(",")]
-        else:
-            self.exitt = exitt
+        self.exitt = exitt
         self.is_perfect = is_perfect
         self.seed = seed
 
-        self.visited = set()
         self.grid = [[15 for _ in range(self.width)] for _ in range(self.height)]
-        
+        self.visited = set()
 
 
     def break_wall(self, x1, y1, x2, y2):
@@ -61,17 +56,15 @@ class MazeGenerator:
                     rx1, ry1 = x1 + ox, y1 + oy
                     rx2, ry2 = x2 + ox, y2 + oy
                     
-                    # self.break_wall(rx1, ry1, rx2, ry2)
+                    #break_wall(grid, rx1, ry1, rx2, ry2)
                     self.visited.add((rx1, ry1))
                     self.visited.add((rx2, ry2))
         except Exception as e:
             print(f"Error: An unexpected error occured {e}")
 
+    
     def generate_maze(self):
         try:
-            #now the maze can regenerate
-            self.visited = set()
-            self.grid = [[15 for _ in range(self.width)] for _ in range(self.height)]
             x, y = self.entry
 
             stack = [(x, y)]
@@ -83,11 +76,7 @@ class MazeGenerator:
             ]
             self.visited.add((x, y))
             self.generate_42_seed()
-            #the same seed can generate the same maze
-            if self.seed:
-                random.seed(int(self.seed))
-            else:
-                random.seed()
+
             while stack:
                 unvisited_cells = []
                 current_x, current_y = stack[-1]
@@ -159,4 +148,5 @@ class MazeGenerator:
                     if not (self.grid[cur_y][cur_x] & bit) and (nx_x, nx_y) not in paths:
                         paths[(nx_x, nx_y)] = ((cur_x, cur_y), char)
                         queue.append((nx_x, nx_y))
+
         return "path not found"
