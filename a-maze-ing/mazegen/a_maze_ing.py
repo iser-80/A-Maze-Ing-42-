@@ -47,7 +47,9 @@ class Maze:
         self.width = int(config.get("WIDTH", 10))
         self.height = int(config.get("HEIGHT", 10))
         entry = config.get("ENTRY", "0,0")
+        exitt = config.get("EXIT", "5, 5")
         self.entry = [int(x) for x in entry.split(",")]
+        self.exitt = [int(x) for x in exitt.split(",")]
         self.grid = [
             [15 for _ in range(self.width)]
             for _ in range(self.height)]
@@ -103,13 +105,15 @@ class Maze:
                 elif move == "W":
                     cx -= 1
                 path_cells.add((cx, cy))
-        sys.stdout.write("\033[H")
+        sys.stdout.write("\033[H\033[J")
         canvas_height = self.height * 2 + 1
         canvas_width = self.width * 2 + 1
-
+        tx, ty = self.entry
+        px, py, = self.exitt
         canvas = [
             [WALL for _ in range(canvas_width)]
             for _ in range(canvas_height)]
+        # canvas[py][px] = "\033[42m  \033[0m"
         for y in range(self.height):
             for x in range(self.width):
                 cy = y * 2 + 1
@@ -132,6 +136,8 @@ class Maze:
                     canvas[cy][cx - 1] = SPACE
                 if not (cell & self.E):
                     canvas[cy][cx + 1] = SPACE
+        canvas[ty * 2 + 1][tx * 2 + 1] = "\033[41m  \033[0m"
+        canvas[py * 2 + 1][px * 2 + 1] = "\033[42m  \033[0m"
         for row in canvas:
             print("".join(row))
         sys.stdout.flush()

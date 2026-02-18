@@ -111,6 +111,42 @@ class MazeGenerator:
         except Exception as e:
             print(f"Error: An unexpected error occured {e}")
 
+    def has_multiple_solutions(self) -> bool:
+        start = tuple(self.entry)
+        end = tuple(self.exitt)
+
+        directions = [
+            (0, -1, 1),
+            (1, 0, 2),
+            (0, 1, 4),
+            (-1, 0, 8),
+        ]
+
+        count = 0
+        visited = set()
+
+        def dfs(current: tuple) -> Any:
+            nonlocal count
+            if count >= 2:
+                return
+            if current == end:
+                count += 1
+                return
+
+            x, y = current
+            visited.add(current)
+
+            for dx, dy, bit in directions:
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < self.width and 0 <= ny < self.height:
+                    if not (self.grid[y][x] & bit) and (nx, ny) not in visited:
+                        dfs((nx, ny))
+
+            visited.remove(current)
+
+        dfs(start)
+        return count >= 2
+
     def generate_maze(
         self, maze: a_maze_ing.Maze | None, animate: bool = False
     ) -> None:
@@ -168,20 +204,29 @@ class MazeGenerator:
                     stack.pop()
 
             if not self.is_perfect:
-                for _ in range(10):
-                    random_x = random.randrange(0, self.width)
-                    random_y = random.randrange(0, self.height)
-                    possible_walls = []
+                attempts = 0
+                mx = self.width * self.height * 5
 
-                    for dir_x, dir_y, bit in directions:
-                        nx, ny = random_x + dir_x, random_y + dir_y
+                while not (self.has_multiple_solutions() and attempts < mx):
+                    attempts += 1
+
+                    x = random.randrange(self.width)
+                    y = random.randrange(self.height)
+
+                    directions = [
+                        (0, -1, 1),
+                        (1, 0, 2),
+                        (0, 1, 4),
+                        (-1, 0, 8),
+                    ]
+                    random.shuffle(directions)
+
+                    for dx, dy, bit in directions:
+                        nx, ny = x + dx, y + dy
                         if 0 <= nx < self.width and 0 <= ny < self.height:
-                            if self.grid[random_y][random_x] & bit:
-                                possible_walls.append((nx, ny, bit))
-
-                    if possible_walls:
-                        target_x, target_y, bit = random.choice(possible_walls)
-                        self.break_wall(random_x, random_y, target_x, target_y)
+                            if self.grid[y][x] & bit:
+                                self.break_wall(x, y, nx, ny)
+                                break
         except Exception as e:
             print(f"Error: an unexpected error occured {e}")
 

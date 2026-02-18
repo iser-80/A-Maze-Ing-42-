@@ -7,7 +7,7 @@ name = "mazegen"
 version = "0.0.1"
 description = "a-maze-ing a random maze generator"
 authors = [
-    {name = "ierafiy"},
+    {name = "ierrafiy"},
     {name = "maissam"}
 ]
 requires-python = '>=3.10'

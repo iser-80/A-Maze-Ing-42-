@@ -19,11 +19,13 @@ def main() -> None:
         maze = Maze(config)
         rseed = maze.config.get("SEED", "").strip()
         seed = None if rseed == "" else int(rseed)
+        path_flag = maze.config.get(
+            "PERFECT", "TRUE").strip().lower() == "true"
         generator = MazeGenerator(
             maze.width, maze.height,
             maze.entry,
             maze.config.get("EXIT", f"{maze.width - 1}, {maze.height - 1}"),
-            True,
+            path_flag,
             seed
         )
         generator.generate_maze(maze=maze, animate=True)
@@ -67,6 +69,7 @@ def main() -> None:
                 except Exception as e:
                     print(f"the maze did not save succusfuly, ERROR {e}")
             elif choice == 5:
+                sys.stdout.write("\033[H\033[J")
                 sys.exit(0)
     except KeyboardInterrupt as e:
         print(f"keyboard interrupt: {e}")
