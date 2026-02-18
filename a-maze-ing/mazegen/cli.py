@@ -3,7 +3,14 @@ from .a_maze_ing import Maze, parsing
 from .maze_generator import MazeGenerator
 
 
-def main():
+def main() -> None:
+    """
+        function, groups all about the execution steps:
+            - generation
+            - solving
+            - export
+            - display and animations
+    """
     if len(sys.argv) != 2:
         print("please add the config file")
         sys.exit(1)

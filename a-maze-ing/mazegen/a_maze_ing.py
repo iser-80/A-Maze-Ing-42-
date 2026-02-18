@@ -1,9 +1,19 @@
 import time
 import os
 import sys
+from typing import Any
 
 
-def parsing(file_name):
+def parsing(file_name: str) -> dict:
+    """
+        function, parse data from a given file to a return dictionary config
+
+        Args:
+            file_name: file: text file with random maze data
+
+        Return:
+            config -> dict: contained parsed data from the file_name
+    """
     if not os.path.isfile(file_name):
         print(f"Error the config file {file_name} was not found")
         sys.exit(1)
@@ -20,9 +30,18 @@ def parsing(file_name):
 
 
 class Maze:
+    """
+        class, helps the generated maze with it's display and export
+    """
     N, E, S, W = 1, 2, 4, 8
 
-    def __init__(self, config):
+    def __init__(self, config: dict[Any, Any]) -> None:
+        """
+            class initializer, takes config as the only assigned attibute
+
+            Args:
+                config -> dict: group the parsed data from the extern file
+        """
         self.config = config
         self.solution_path = ""
         self.width = int(config.get("WIDTH", 10))
@@ -32,9 +51,17 @@ class Maze:
         self.grid = [
             [15 for _ in range(self.width)]
             for _ in range(self.height)]
+        self.pattern_42: set = set()
         print(f"Maze created {self.width}x{self.height}")
 
-    def display(self, show_path=False, color_mode=0):
+    def display(self, show_path: bool = False, color_mode: int = 0) -> None:
+        """
+            function, transform the grid into a colorized map (maze)
+
+            Args:
+                show_path -> bool: determine if the path showen
+                color_mode -> int: define a specific color of the maze
+        """
         colors = [
             "\033[31m",
             "\033[32m",
@@ -109,7 +136,12 @@ class Maze:
             print("".join(row))
         sys.stdout.flush()
 
-    def save_into_file(self):
+    def save_into_file(self) -> None:
+        """
+            funciton, exports the hex code (the solution of the maze)
+            into a .txt file with other attributes
+
+        """
         file_name = self.config.get("OUTPUT_FILE", "maze.txt")
 
         try:

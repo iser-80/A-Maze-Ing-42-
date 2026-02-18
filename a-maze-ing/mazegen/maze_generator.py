@@ -1,30 +1,45 @@
 import random
 from collections import deque
+from typing import Any
 import time
 import a_maze_ing
 
 
 class MazeGenerator:
-
+    """
+        class, responsable about the creation and solving a maze
+    """
     def __init__(
         self,
         width: int,
         height: int,
-        entry: tuple,
-        exitt: list,
+        entry: list[Any],
+        exitt: list[Any],
         is_perfect: bool,
-        seed: int,
+        seed: int | None,
     ) -> None:
+        """
+            class initiaizer
+
+            Args:
+                width -> int: width of the maze
+                height -> int: height of the maze
+                entry -> list: the coordinates of the start position
+                exitt -> list: the coordinates of the exit position
+                is_perfect -> bool: describle if the maze should has
+                    a perfect solution
+                seed -> int: acts as the dna of the maze
+        """
         self.width: int = width
         self.height: int = height
-        self.entry: tuple = entry
+        self.entry: list = entry
         self.blocked: set = set()
         if isinstance(exitt, str):
             self.exitt: list = [int(x) for x in exitt.split(",")]
         else:
             self.exitt = exitt
         self.is_perfect: bool = is_perfect
-        self.seed: int = seed
+        self.seed = seed
 
         self.visited: set = set()
         self.grid: list[list] = [
@@ -32,6 +47,12 @@ class MazeGenerator:
         ]
 
     def break_wall(self, x1: int, y1: int, x2: int, y2: int) -> None:
+        """
+            class methode, break a wall of cell in the maze
+
+            Args:
+                x1, y1, x2, y2 -> int: coordinates
+        """
         dx = x2 - x1
         dy = y2 - y1
 
@@ -49,6 +70,10 @@ class MazeGenerator:
             self.grid[y2][x2] -= 2
 
     def generate_42_seed(self) -> None:
+        """
+            class methode, create the 42 seed in the middle
+                of the maze if valid
+        """
         try:
             if self.width >= 18 and self.height >= 15:
                 ox = (self.width - 7) // 2
@@ -89,6 +114,14 @@ class MazeGenerator:
     def generate_maze(
         self, maze: a_maze_ing.Maze = None, animate: bool = False
     ) -> None:
+        """
+            class methode generate a random maze
+
+            Args:
+                maze -> instance(Maze): instance has the nessecerly
+                    data for the maze generation
+                animate -> bool: define if the animation should execute or not
+        """
         try:
             self.visited = set()
             self.grid = [
@@ -107,7 +140,7 @@ class MazeGenerator:
             self.generate_42_seed()
             # the same seed can generate the same maze
             if self.seed is not None or self.seed == "":
-                random.seed(int(self.seed))
+                random.seed(self.seed)
             else:
                 random.seed()
             while stack:
@@ -154,10 +187,22 @@ class MazeGenerator:
 
     @staticmethod
     def reconstruct_path(
-        paths: dict[tuple[int, int], tuple[tuple[int, int], str | None]],
+        paths: dict[tuple[int, int], Any],
         start: tuple,
         end: tuple,
     ) -> str:
+        """
+            static method, reconstruct the solution path into a string
+
+            Args:
+                path -> dict[]: a list of coordinats
+                    (define the path of the solution)
+                start -> tuple: the start position
+                end -> tuple: the exit position
+
+            Return:
+                (string) -> str: converted string of the path list solution
+        """
         current = end
         path_letter = []
 
@@ -169,6 +214,13 @@ class MazeGenerator:
         return "".join(reversed(path_letter))
 
     def solve_maze(self) -> str:
+        """
+            class methode, solve the maze with bfs algo
+
+            Return:
+                (path) -> list: list of coordinate positions that form
+                    the solution path
+        """
         width = len(self.grid[0])
         height = len(self.grid)
         start = tuple(self.entry)
@@ -181,7 +233,9 @@ class MazeGenerator:
             (-1, 0, 8, "W"),
         ]
         queue = deque([start])
-        paths = {start: None}
+        # Tell Python the values can be a Tuple OR None
+        paths: dict[tuple[
+            int, int], tuple[tuple[int, int], str] | None] = {start: None}
 
         while queue:
             cur_x, cur_y = queue.popleft()
