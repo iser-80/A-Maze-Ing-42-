@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mazegen"
+version = "0.0.1"
+description = "a-maze-ing a random maze generator"
+authors = [
+    {name = "ierafiy"},
+    {name = "maissam"}
+]
+requires-python = '>=3.10'
+
+[project.scripts]
+a-maze-ing = "mazegen.cli:main"
