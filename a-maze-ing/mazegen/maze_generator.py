@@ -2,7 +2,7 @@ import random
 from collections import deque
 from typing import Any
 import time
-import a_maze_ing
+from . import a_maze_ing
 
 
 class MazeGenerator:
@@ -112,7 +112,7 @@ class MazeGenerator:
             print(f"Error: An unexpected error occured {e}")
 
     def generate_maze(
-        self, maze: a_maze_ing.Maze = None, animate: bool = False
+        self, maze: a_maze_ing.Maze | None, animate: bool = False
     ) -> None:
         """
             class methode generate a random maze

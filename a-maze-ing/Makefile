@@ -1,5 +1,5 @@
-NAME = a_maze_ing.py
-CONFIG = config.txt
+NAME = mazegen.a_maze_ing
+CONFIG = mazegen/config.txt
 PYTHON = python3
 PIP = pip3
 
@@ -9,13 +9,13 @@ install:
 	$(PIP) install --upgrade flake8 mypy toml
 
 run:
-	$(PYTHON) $(NAME) $(CONFIG)
+	$(PYTHON) -m $(NAME) $(CONFIG)
 
 debug:
 	$(PYTHON) -m pdb $(NAME) $(CONFIG)
 
 clean:
-	rm -rf __pycache__ .mypy_cache
+	rm -rf ./mazegen/__pycache__ ./mazegen/.mypy_cache
 
 lint:
 	flake8 .
