@@ -141,10 +141,10 @@ class Maze:
         WALL = f"{wall_color}{BLOCK * 2}{RESET}"
         # SPACE = f"\033[30m{BLOCK}{RESET}"
         SPACE = "  "
-        path_cells = set()
+        path_cells = []
         if show_path and self.solution_path:
             cx, cy = self.entry
-            path_cells.add((cx, cy))
+            path_cells.append((cx, cy))
             for move in self.solution_path:
                 if move == "N":
                     cy -= 1
@@ -154,7 +154,7 @@ class Maze:
                     cx += 1
                 elif move == "W":
                     cx -= 1
-                path_cells.add((cx, cy))
+                path_cells.append((cx, cy))
         sys.stdout.write("\033[H\033[J")
         canvas_height = self.height * 2 + 1
         canvas_width = self.width * 2 + 1
@@ -171,8 +171,8 @@ class Maze:
 
                 if hasattr(self, "pattern_42") and (x, y) in self.pattern_42:
                     canvas[cy][cx] = f"{PATTERN_COLOR}{BLOCK * 2}{RESET}"
-                elif (x, y) in path_cells:
-                    canvas[cy][cx] = f"{PATH_COLOR}{BLOCK * 2}{RESET}"
+                # elif (x, y) in path_cells:
+                #     canvas[cy][cx] = f"{PATH_COLOR}{BLOCK * 2}{RESET}"
                 else:
                     canvas[cy][cx] = SPACE
 
@@ -186,11 +186,31 @@ class Maze:
                     canvas[cy][cx - 1] = SPACE
                 if not (cell & self.E):
                     canvas[cy][cx + 1] = SPACE
+
         canvas[ty * 2 + 1][tx * 2 + 1] = "\033[41m  \033[0m"
         canvas[py * 2 + 1][px * 2 + 1] = "\033[42m  \033[0m"
         for row in canvas:
             print("".join(row))
         sys.stdout.flush()
+        i = 0
+        tmp = path_cells
+        while i + 1 < len(list(tmp)):
+            x1, y1 = tmp[i]
+            x2, y2 = tmp[i + 1]
+            cx = (x1 * 2) + 1
+            cy = (y1 * 2) + 1
+            g1 = int((((x1 * 2) + 1) + ((x2 * 2) + 1)) / 2)
+            g2 = int((((y1 * 2) + 1) + ((y2 * 2) + 1)) / 2)
+            canvas[cy][cx] = f"{PATH_COLOR}{BLOCK * 2}{RESET}"
+            canvas[g2][g1] = f"{PATH_COLOR}{BLOCK * 2}{RESET}"
+            print(canvas[cy][cx])
+            print(canvas[g2][g1])
+            print("\033[H\033[J", end="")
+            for row in canvas:
+                print("".join(row))
+            print()
+            time.sleep(0.1)
+            i += 1
 
     def save_into_file(self) -> None:
         """
@@ -218,7 +238,7 @@ class Maze:
             print(f"Error saving file: {e}")
 
 
-if __name__ == "__main__":
-    from .cli import main
+# if __name__ == "__main__":
+#     from .cli import main
 
-    main()
+#     main()

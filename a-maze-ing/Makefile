@@ -1,5 +1,5 @@
-NAME = mazegen.a_maze_ing
-CONFIG = mazegen/config.txt
+NAME = a-maze-ing
+CONFIG = config.txt
 PYTHON = python3
 PIP = pip3
 
