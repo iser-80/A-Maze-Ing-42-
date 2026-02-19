@@ -18,12 +18,13 @@ def main() -> None:
         config = parsing(sys.argv[1])
         maze = Maze(config)
         rseed = maze.config.get("SEED", "").strip()
+        rentry = maze.config.get("ENTRY", "0, 0")
         seed = None if rseed == "" else int(rseed)
         path_flag = maze.config.get(
             "PERFECT", "TRUE").strip().lower() == "true"
         generator = MazeGenerator(
             maze.width, maze.height,
-            maze.entry,
+            maze.config.get("ENTRY", "0, 0"),
             maze.config.get("EXIT", f"{maze.width - 1}, {maze.height - 1}"),
             path_flag,
             seed

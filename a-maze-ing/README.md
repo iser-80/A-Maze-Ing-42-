@@ -7,11 +7,26 @@ the program generates random mazes with the option of generating maze bease on s
 it support colored and animated generation, path solving from entry to exit, and saving the maze into a file 
 
 # Instructions
-clone the repo and install the package localy
+clone the repo and install the package locally
 `bash`
 `pip install .`
 `a-maze-ing config.txt`
 
+# Algorithem Used
+Depth-First Search (DFS) — Maze generation
+Breadth-First Search (BFS) — Path solving
+
+- The configuration file allows you to define:
+
+    - Maze dimensions (WIDTH, HEIGHT)
+
+    - Entry and exit coordinates
+
+    - Seed value (optional)
+
+    - Perfect / imperfect maze generation
+
+    - Display options (colors, animation, path visibility)
 
 # Resources
 https://www.geeksforgeeks.org/python/print-colors-python-terminal/

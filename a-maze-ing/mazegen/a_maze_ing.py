@@ -42,19 +42,24 @@ class Maze:
             Args:
                 config -> dict: group the parsed data from the extern file
         """
-        self.config = config
-        self.solution_path = ""
-        self.width = int(config.get("WIDTH", 10))
-        self.height = int(config.get("HEIGHT", 10))
-        entry = config.get("ENTRY", "0,0")
-        exitt = config.get("EXIT", "5, 5")
-        self.entry = [int(x) for x in entry.split(",")]
-        self.exitt = [int(x) for x in exitt.split(",")]
-        self.grid = [
-            [15 for _ in range(self.width)]
-            for _ in range(self.height)]
-        self.pattern_42: set = set()
-        print(f"Maze created {self.width}x{self.height}")
+        try:
+            self.config = config
+            self.solution_path = ""
+            self.width = int(config.get("WIDTH", 10))
+            self.height = int(config.get("HEIGHT", 10))
+            entry = config.get("ENTRY", "5, 5")
+            exitt = config.get("EXIT", "5, 5")
+            self.entry = [int(x) for x in entry.split(",")]
+            self.exitt = [int(x) for x in exitt.split(",")]
+            self.grid = [
+                [15 for _ in range(self.width)]
+                for _ in range(self.height)]
+            self.pattern_42: set = set()
+        except ValueError as e:
+            print(f"Error: value error {e}")
+            sys.exit(1)
+        except Exception as e:
+            print(f"Error: an unexpected error occured {e}")
 
     def display(self, show_path: bool = False, color_mode: int = 0) -> None:
         """

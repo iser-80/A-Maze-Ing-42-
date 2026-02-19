@@ -2,5 +2,5 @@ Metadata-Version: 2.4
 Name: mazegen
 Version: 0.0.1
 Summary: a-maze-ing a random maze generator
-Author: ierafiy, maissam
+Author: ierrafiy, maissam
 Requires-Python: >=3.10

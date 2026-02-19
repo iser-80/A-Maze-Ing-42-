@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mazegen"
-version = "0.0.1"
+version = "1.0.0"
 description = "a-maze-ing a random maze generator"
 authors = [
     {name = "ierrafiy"},
