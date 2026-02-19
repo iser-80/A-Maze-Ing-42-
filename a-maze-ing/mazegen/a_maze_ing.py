@@ -25,8 +25,52 @@ def parsing(file_name: str) -> dict:
                 continue
             if "=" in line:
                 key, value = line.split("=", 1)
-                config[key.strip()] = value.strip()
+                config[key.strip().lower()] = value.strip()
     return config
+
+
+def config_checker(config: dict[Any, Any]) -> None:
+    """
+        function, takes config and checks it's keys and values if
+        valid for the maze generation
+
+        Args:
+            config -> dict: maze data wrapper
+    """
+    man_keys = ["entry", "exit", "perfect", "width", "height", "output_file"]
+    for key in man_keys:
+        if key not in config.keys():
+            raise ValueError(f"missing a mandatory key {key}")
+
+        if key in ["width", "height"]:
+            val = int(config[key])
+            if val < 0:
+                raise ValueError(
+                    "please provide a valid width and height values")
+        if key in ["entry", "exit"]:
+            val = config[key]
+            try:
+                coords = [int(x.strip()) for x in val.split(",")]
+
+                if len(coords) != 2:
+                    raise ValueError
+
+                vx, vy = coords
+                if vx < 0 or vy < 0:
+                    raise ValueError
+            except (ValueError, AttributeError):
+                raise ValueError(
+                    f"Invalid format for {key}. "
+                    f"Use 'x,y' with non-negative integers."
+                )
+        if key == "perfect":
+            val = config["perfect"]
+            if isinstance(val, str):
+                if val.lower() not in ["true", "false"]:
+                    raise ValueError(
+                        "perfect value should be 'true' or 'false'")
+            elif not isinstance(val, bool):
+                raise ValueError("perfect value should be a boolean")
 
 
 class Maze:
@@ -44,13 +88,14 @@ class Maze:
         """
         try:
             self.config = config
+            config_checker(config)
             self.solution_path = ""
-            self.width = int(config.get("WIDTH", 10))
-            self.height = int(config.get("HEIGHT", 10))
-            entry = config.get("ENTRY", "5, 5")
-            exitt = config.get("EXIT", "5, 5")
-            self.entry = [int(x) for x in entry.split(",")]
-            self.exitt = [int(x) for x in exitt.split(",")]
+            self.width = int(config.get("width", 10))
+            self.height = int(config.get("height", 10))
+            entry = config.get("entry", "0, 0")
+            exitt = config.get("exit", f"{self.width - 1}, {self.height - 1}")
+            self.entry = [int(x) for x in entry.split(",") if x is not None]
+            self.exitt = [int(x) for x in exitt.split(",") if x is not None]
             self.grid = [
                 [15 for _ in range(self.width)]
                 for _ in range(self.height)]

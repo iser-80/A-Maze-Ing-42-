@@ -112,6 +112,12 @@ class MazeGenerator:
             print(f"Error: An unexpected error occured {e}")
 
     def has_multiple_solutions(self) -> bool:
+        """
+            helper funciton, check if the maze has more than on solution path
+
+            Return:
+                bool
+        """
         start = tuple(self.entry)
         end = tuple(self.exitt)
 

@@ -17,16 +17,19 @@ Depth-First Search (DFS) — Maze generation
 Breadth-First Search (BFS) — Path solving
 
 - The configuration file allows you to define:
-
     - Maze dimensions (WIDTH, HEIGHT)
-
     - Entry and exit coordinates
-
     - Seed value (optional)
-
     - Perfect / imperfect maze generation
-
     - Display options (colors, animation, path visibility)
+
+- we divide the project into 2 parts: 
+    + algorithms coding(taken by ierrafiy) 
+    + animations and visualisation (taken by maissam)
+
+- helper tools:
+    - we use Ai for algorithms explanations
+    - youtube tutorials
 
 # Resources
 https://www.geeksforgeeks.org/python/print-colors-python-terminal/
