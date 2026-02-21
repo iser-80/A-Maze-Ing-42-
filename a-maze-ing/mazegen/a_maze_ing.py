@@ -228,7 +228,8 @@ class Maze:
             cy = (y1 * 2) + 1
             g1 = int((((x1 * 2) + 1) + ((x2 * 2) + 1)) / 2)
             g2 = int((((y1 * 2) + 1) + ((y2 * 2) + 1)) / 2)
-            canvas[cy][cx] = f"{PATH_COLOR}{BLOCK * 2}{RESET}"
+            if (x1, y1) not in ((px, py), (tx, ty)):
+                canvas[cy][cx] = f"{PATH_COLOR}{BLOCK * 2}{RESET}"
             canvas[g2][g1] = f"{PATH_COLOR}{BLOCK * 2}{RESET}"
             print(canvas[cy][cx])
             print(canvas[g2][g1])
