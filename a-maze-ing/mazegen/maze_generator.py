@@ -79,20 +79,12 @@ class MazeGenerator:
                 oy = (self.height - 5) // 2
 
                 segments = [
-                    # (0, 0, 0, 1),
-                    # (0, 1, 0, 2),
-                    # (2, 0, 2, 1),
-                    # (2, 1, 2, 2),
-                    # (2, 2, 2, 3),
-                    # (2, 3, 2, 4),
-                    # (0, 2, 1, 2),
-                    # (1, 2, 2, 2),
                     # The "4"
-					(0, 0, 0, 1), 
+                    (0, 0, 0, 1),
                     (0, 1, 0, 2),
-					(0, 2, 1, 2), 
+                    (0, 2, 1, 2),
                     (1, 2, 2, 2),
-					(2, 2, 2, 3), 
+                    (2, 2, 2, 3),
                     (2, 3, 2, 4),
                     # The "2"
                     (4, 0, 5, 0),
@@ -222,9 +214,14 @@ class MazeGenerator:
                 dx, dy, bit = random.choice(directions)
                 nx, ny = rx + dx, ry + dy
 
+                if (rx, ry) in self.blocked or (nx, ny) in self.blocked:
+                    continue
+
                 if self.grid[ry][rx] & bit:
                     self.break_wall(rx, ry, nx, ny)
                     broken += 1
+        # for x, y in self.blocked:
+        #     self.grid[y][x] = 15
 
     @staticmethod
     def reconstruct_path(
@@ -288,6 +285,7 @@ class MazeGenerator:
                     if (
                         not (self.grid[cur_y][cur_x] & bit)
                         and (nx_x, nx_y) not in paths
+                        and (nx_x, nx_y) not in self.blocked
                     ):
                         paths[(nx_x, nx_y)] = ((cur_x, cur_y), char)
                         queue.append((nx_x, nx_y))

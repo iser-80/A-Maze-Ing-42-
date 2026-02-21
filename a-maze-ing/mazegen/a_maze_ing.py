@@ -13,6 +13,9 @@ def parsing(file_name: str) -> dict[str, str]:
         print(f"Error: The configuration file '{file_name}' was not found.")
         sys.exit(1)
 
+    man_keys = [
+        "entry", "exit", "perfect", "width", "height", "output_file", "seed"
+        ]
     config: dict[str, str] = {}
 
     try:
@@ -31,7 +34,9 @@ def parsing(file_name: str) -> dict[str, str]:
                 key, value = line.split("=", 1)
                 key = key.strip().lower()
                 value = value.strip()
-
+                if key not in man_keys:
+                    print(f"Error: Invalid key {key} in the configuration")
+                    sys.exit(1)
                 if not key or not value:
                     print(f"Error: Missing key or value"
                           f"on line {line_num}.")
