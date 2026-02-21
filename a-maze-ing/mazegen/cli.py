@@ -17,18 +17,19 @@ def main() -> None:
             sys.exit(1)
         config = parsing(sys.argv[1])
         maze = Maze(config)
-        rseed = maze.config.get("SEED", "").strip()
+        rseed = maze.config.get("seed", "").strip()
         seed = None if rseed == "" else int(rseed)
         path_flag = maze.config.get(
-            "PERFECT", "TRUE").strip().lower() == "true"
+            "perfect", "true").strip().lower() == "true"
         generator = MazeGenerator(
             maze.width, maze.height,
             maze.entry,
-            maze.config.get("EXIT", f"{maze.width - 1}, {maze.height - 1}"),
+            maze.exitt,
             path_flag,
             seed
         )
         generator.generate_maze(maze=maze, animate=True)
+        # raise ValueError(generator.is_perfect)
         maze.grid = generator.grid
         maze.pattern_42 = generator.blocked
         maze.solution_path = generator.solve_maze()
@@ -36,6 +37,11 @@ def main() -> None:
         color_mode = 0
         show_path = False
         maze.save_into_file()
+        # In main() in cli.py, after generating:
+        # if generator.has_multiple_solutions():
+        #     print("LOG: This maze has MULTIPLE solution paths!")
+        # else:
+        #     print("LOG: This maze is still perfect.")
         while True:
             print("1 . Re-generatre a new maze")
             print("2 . SHOW/HIDE path from entry to exit")

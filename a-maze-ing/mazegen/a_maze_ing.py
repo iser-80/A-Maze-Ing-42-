@@ -4,73 +4,101 @@ import sys
 from typing import Any
 
 
-def parsing(file_name: str) -> dict:
+import os
+import sys
+from typing import Any
+
+def parsing(file_name: str) -> dict[str, str]:
     """
-        function, parse data from a given file to a return dictionary config
-
-        Args:
-            file_name: file: text file with random maze data
-
-        Return:
-            config -> dict: contained parsed data from the file_name
+        Parses a configuration file into a dictionary.
+        Handles syntax errors and missing files gracefully.
     """
     if not os.path.isfile(file_name):
-        print(f"Error the config file {file_name} was not found")
+        print(f"Error: The configuration file '{file_name}' was not found.")
         sys.exit(1)
-    config = {}
-    with open(file_name, "r") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if "=" in line:
+
+    config: dict[str, str] = {}
+    
+    try:
+        with open(file_name, "r") as f:
+            for line_num, line in enumerate(f, 1):
+                line = line.strip()
+                
+                if not line or line.startswith("#"):
+                    continue
+                
+                if "=" not in line:
+                    print(f"Error: Syntax error on line {line_num}: '{line}'. Missing '='.")
+                    sys.exit(1)
+                
                 key, value = line.split("=", 1)
-                config[key.strip().lower()] = value.strip()
+                key = key.strip().lower()
+                value = value.strip()
+                
+                if not key or not value:
+                    print(f"Error: Missing key or value on line {line_num}.")
+                    sys.exit(1)
+                
+                config[key] = value
+                
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        sys.exit(1)
+        
     return config
 
 
-def config_checker(config: dict[Any, Any]) -> None:
+def config_checker(config: dict[str, Any]) -> None:
     """
-        function, takes config and checks it's keys and values if
-        valid for the maze generation
-
-        Args:
-            config -> dict: maze data wrapper
+        Validates configuration values.
+        Ensures entry/exit are within bounds,
+        different from each other,
+        and maze dimensions are logical.
     """
     man_keys = ["entry", "exit", "perfect", "width", "height", "output_file"]
+    
     for key in man_keys:
-        if key not in config.keys():
-            raise ValueError(f"missing a mandatory key {key}")
+        if key not in config:
+            print(f"Error: Missing mandatory key '{key}' in configuration.")
+            sys.exit(1)
 
-        if key in ["width", "height"]:
-            val = int(config[key])
-            if val < 0:
-                raise ValueError(
-                    "please provide a valid width and height values")
-        if key in ["entry", "exit"]:
-            val = config[key]
-            try:
-                coords = [int(x.strip()) for x in val.split(",")]
+    try:
+        width = int(config["width"])
+        height = int(config["height"])
+        if width <= 0 or height <= 0:
+            print("Error: WIDTH and HEIGHT must be positive integers.")
+            sys.exit(1)
+            
+        coords_data = {}
+        for key in ["entry", "exit"]:
+            raw_val = config[key]
+            parts = [p.strip() for p in raw_val.split(",")]
+            if len(parts) != 2:
+                print(f"Error: {key.upper()} must be in 'x,y' format.")
+                sys.exit(1)
+            
+            x, y = int(parts[0]), int(parts[1])
+            
+            if not (0 <= x < width and 0 <= y < height):
+                print(f"Error: {key.upper()} ({x},{y}) is outside the maze bounds.")
+                sys.exit(1)
+            
+            coords_data[key] = (x, y)
 
-                if len(coords) != 2:
-                    raise ValueError
+        if coords_data["entry"] == coords_data["exit"]:
+            print("Error: ENTRY and EXIT coordinates must be different.")
+            sys.exit(1)
 
-                vx, vy = coords
-                if vx < 0 or vy < 0:
-                    raise ValueError
-            except (ValueError, AttributeError):
-                raise ValueError(
-                    f"Invalid format for {key}. "
-                    f"Use 'x,y' with non-negative integers."
-                )
-        if key == "perfect":
-            val = config["perfect"]
-            if isinstance(val, str):
-                if val.lower() not in ["true", "false"]:
-                    raise ValueError(
-                        "perfect value should be 'true' or 'false'")
-            elif not isinstance(val, bool):
-                raise ValueError("perfect value should be a boolean")
+        if config["perfect"].lower() not in ["true", "false"]:
+            print("Error: PERFECT must be 'True' or 'False'.")
+            sys.exit(1)
+
+        if width < 7 or height < 5:
+            print("Warning: Maze size is too small to draw the '42' pattern.")
+
+    except ValueError:
+        print("Error: Configuration contains invalid numeric values.")
+        sys.exit(1)
 
 
 class Maze:
@@ -218,22 +246,18 @@ class Maze:
             into a .txt file with other attributes
 
         """
-        file_name = self.config.get("OUTPUT_FILE", "maze.txt")
-
+        file_name = self.config.get("output_file", "maze.txt")
         try:
             with open(file_name, "w") as f:
                 for row in self.grid:
-                    f.write(
-                        "".join(hex(cell)[2:].upper() for cell in row) + "\n")
+                    f.write("".join(hex(cell)[2:].upper() for cell in row) + "\n")
+                
                 f.write("\n")
 
-                f.write(f"{self.entry[0]}" f" {self.entry[1]}\n")
-                exitv = self.config.get(
-                    "EXIT", f"{self.width - 1}" f" {self.height - 1}"
-                )
-                f.write(f"{exitv}\n")
-                solution = getattr(self, "solution_path", "")
-                f.write(f"{solution}\n")
+                f.write(f"{self.entry[0]} {self.entry[1]}\n")
+                f.write(f"{self.exitt[0]} {self.exitt[1]}\n")
+                
+                f.write(f"{self.solution_path}\n")
         except Exception as e:
             print(f"Error saving file: {e}")
 

@@ -153,88 +153,55 @@ class MazeGenerator:
         dfs(start)
         return count >= 2
 
-    def generate_maze(
-        self, maze: a_maze_ing.Maze | None, animate: bool = False
-    ) -> None:
-        """
-            class methode generate a random maze
+    def generate_maze(self, maze: Any | None, animate: bool = False) -> None:
+        # 1. REMOVE THE INTERNAL TRY/EXCEPT BLOCK
+        self.visited = set()
+        self.grid = [[15 for _ in range(self.width)] for _ in range(self.height)]
+        x, y = self.entry
 
-            Args:
-                maze -> instance(Maze): instance has the nessecerly
-                    data for the maze generation
-                animate -> bool: define if the animation should execute or not
-        """
-        try:
-            self.visited = set()
-            self.grid = [
-                [15 for _ in range(self.width)]
-                for _ in range(self.height)]
-            x, y = self.entry
+        stack = [(x, y)]
+        directions = [(0, -1, 1), (1, 0, 2), (0, 1, 4), (-1, 0, 8)]
+        
+        self.visited.add((x, y))
+        self.generate_42_seed()
+        
+        # Seed logic cleanup
+        random.seed(self.seed) if self.seed is not None else random.seed()
 
-            stack = [(x, y)]
-            directions = [
-                (0, -1, 1),
-                (1, 0, 2),
-                (0, 1, 4),
-                (-1, 0, 8),
-            ]
-            self.visited.add((x, y))
-            self.generate_42_seed()
-            # the same seed can generate the same maze
-            if self.seed is not None or self.seed == "":
-                random.seed(self.seed)
+        # Standard DFS Generation
+        while stack:
+            current_x, current_y = stack[-1]
+            unvisited_cells = []
+            for dir_x, dir_y, bit in directions:
+                nx, ny = current_x + dir_x, current_y + dir_y
+                if (0 <= nx < self.width and 0 <= ny < self.height and 
+                    (nx, ny) not in self.visited and (nx, ny) not in self.blocked):
+                    unvisited_cells.append((nx, ny, bit))
+            
+            if unvisited_cells:
+                nx, ny, bit = random.choice(unvisited_cells)
+                self.break_wall(current_x, current_y, nx, ny)
+                self.visited.add((nx, ny))
+                stack.append((nx, ny))
+                if animate and maze:
+                    maze.grid = self.grid
+                    maze.display()
+                    time.sleep(0.01)
             else:
-                random.seed()
-            while stack:
-                unvisited_cells = []
-                current_x, current_y = stack[-1]
-                for dir_x, dir_y, bit in directions:
-                    nx_x, nx_y = current_x + dir_x, current_y + dir_y
-                    if (
-                        0 <= nx_x < self.width
-                        and 0 <= nx_y < self.height
-                        and (nx_x, nx_y) not in self.visited
-                        and (nx_x, nx_y) not in self.blocked
-                    ):
-                        unvisited_cells.append((nx_x, nx_y, bit))
-                if unvisited_cells:
-                    nx_x, nx_y, bit = random.choice(unvisited_cells)
-                    self.break_wall(current_x, current_y, nx_x, nx_y)
-                    if animate and maze:
-                        maze.grid = self.grid
-                        maze.display()
-                        time.sleep(0.01)
-                    self.visited.add((nx_x, nx_y))
-                    stack.append((nx_x, nx_y))
-                else:
-                    stack.pop()
+                stack.pop()
 
-            if not self.is_perfect:
-                attempts = 0
-                mx = self.width * self.height * 5
-
-                while not (self.has_multiple_solutions() and attempts < mx):
-                    attempts += 1
-
-                    x = random.randrange(self.width)
-                    y = random.randrange(self.height)
-
-                    directions = [
-                        (0, -1, 1),
-                        (1, 0, 2),
-                        (0, 1, 4),
-                        (-1, 0, 8),
-                    ]
-                    random.shuffle(directions)
-
-                    for dx, dy, bit in directions:
-                        nx, ny = x + dx, y + dy
-                        if 0 <= nx < self.width and 0 <= ny < self.height:
-                            if self.grid[y][x] & bit:
-                                self.break_wall(x, y, nx, ny)
-                                break
-        except Exception as e:
-            print(f"Error: an unexpected error occured {e}")
+        if not self.is_perfect:
+            extra_walls_to_break = (self.width * self.height) // 10
+            broken = 0
+            while broken < extra_walls_to_break:
+                rx = random.randrange(1, self.width - 1)
+                ry = random.randrange(1, self.height - 1)
+                dx, dy, bit = random.choice(directions)
+                nx, ny = rx + dx, ry + dy
+                
+                if self.grid[ry][rx] & bit:
+                    self.break_wall(rx, ry, nx, ny)
+                    broken += 1
 
     @staticmethod
     def reconstruct_path(
@@ -284,7 +251,6 @@ class MazeGenerator:
             (-1, 0, 8, "W"),
         ]
         queue = deque([start])
-        # Tell Python the values can be a Tuple OR None
         paths: dict[tuple[
             int, int], tuple[tuple[int, int], str] | None] = {start: None}
 

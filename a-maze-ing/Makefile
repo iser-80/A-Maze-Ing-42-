@@ -15,7 +15,7 @@ debug:
 	$(PYTHON) -m pdb $(NAME) $(CONFIG)
 
 clean:
-	rm -rf ./mazegen/__pycache__ ./mazegen/.mypy_cache
+	rm -rf ./mazegen/__pycache__ ./mazegen/.mypy_cache ./__pycache__
 
 lint:
 	flake8 .
