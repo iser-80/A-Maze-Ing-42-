@@ -2,7 +2,6 @@ import random
 from collections import deque
 from typing import Any
 import time
-from . import a_maze_ing
 
 
 class MazeGenerator:
@@ -132,6 +131,15 @@ class MazeGenerator:
         visited = set()
 
         def dfs(current: tuple) -> Any:
+            """
+                helper funtion, track back the solution path
+
+                Args:
+                    current -> tuple: the current position coordinates
+
+                Return:
+                    bool: if the path solutions is more than 2
+            """
             nonlocal count
             if count >= 2:
                 return
@@ -154,30 +162,38 @@ class MazeGenerator:
         return count >= 2
 
     def generate_maze(self, maze: Any | None, animate: bool = False) -> None:
-        # 1. REMOVE THE INTERNAL TRY/EXCEPT BLOCK
+        """
+            class methode generate a random maze
+
+            Args:
+                maze -> instance(Maze): instance has the nessecerly
+                    data for the maze generation
+                animate -> bool: define if the animation should execute or not
+        """
         self.visited = set()
-        self.grid = [[15 for _ in range(self.width)] for _ in range(self.height)]
+        self.grid = [
+            [15 for _ in range(self.width)]
+            for _ in range(self.height)]
         x, y = self.entry
 
         stack = [(x, y)]
         directions = [(0, -1, 1), (1, 0, 2), (0, 1, 4), (-1, 0, 8)]
-        
+
         self.visited.add((x, y))
         self.generate_42_seed()
-        
-        # Seed logic cleanup
+
         random.seed(self.seed) if self.seed is not None else random.seed()
 
-        # Standard DFS Generation
         while stack:
             current_x, current_y = stack[-1]
             unvisited_cells = []
             for dir_x, dir_y, bit in directions:
                 nx, ny = current_x + dir_x, current_y + dir_y
-                if (0 <= nx < self.width and 0 <= ny < self.height and 
-                    (nx, ny) not in self.visited and (nx, ny) not in self.blocked):
+                if (0 <= nx < self.width and 0 <= ny < self.height and
+                        (nx, ny) not in self.visited and
+                        (nx, ny) not in self.blocked):
                     unvisited_cells.append((nx, ny, bit))
-            
+
             if unvisited_cells:
                 nx, ny, bit = random.choice(unvisited_cells)
                 self.break_wall(current_x, current_y, nx, ny)
@@ -198,7 +214,7 @@ class MazeGenerator:
                 ry = random.randrange(1, self.height - 1)
                 dx, dy, bit = random.choice(directions)
                 nx, ny = rx + dx, ry + dy
-                
+
                 if self.grid[ry][rx] & bit:
                     self.break_wall(rx, ry, nx, ny)
                     broken += 1

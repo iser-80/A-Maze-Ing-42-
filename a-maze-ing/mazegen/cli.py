@@ -18,7 +18,15 @@ def main() -> None:
         config = parsing(sys.argv[1])
         maze = Maze(config)
         rseed = maze.config.get("seed", "").strip()
-        seed = None if rseed == "" else int(rseed)
+
+        rseed = rseed.replace('"', '').replace("'", "")
+        if not rseed:
+            seed = None
+        else:
+            try:
+                seed = int(rseed)
+            except ValueError:
+                seed = None
         path_flag = maze.config.get(
             "perfect", "true").strip().lower() == "true"
         generator = MazeGenerator(
@@ -37,11 +45,6 @@ def main() -> None:
         color_mode = 0
         show_path = False
         maze.save_into_file()
-        # In main() in cli.py, after generating:
-        # if generator.has_multiple_solutions():
-        #     print("LOG: This maze has MULTIPLE solution paths!")
-        # else:
-        #     print("LOG: This maze is still perfect.")
         while True:
             print("1 . Re-generatre a new maze")
             print("2 . SHOW/HIDE path from entry to exit")

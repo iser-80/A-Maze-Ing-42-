@@ -4,10 +4,6 @@ import sys
 from typing import Any
 
 
-import os
-import sys
-from typing import Any
-
 def parsing(file_name: str) -> dict[str, str]:
     """
         Parses a configuration file into a dictionary.
@@ -18,33 +14,35 @@ def parsing(file_name: str) -> dict[str, str]:
         sys.exit(1)
 
     config: dict[str, str] = {}
-    
+
     try:
         with open(file_name, "r") as f:
             for line_num, line in enumerate(f, 1):
                 line = line.strip()
-                
+
                 if not line or line.startswith("#"):
                     continue
-                
+
                 if "=" not in line:
-                    print(f"Error: Syntax error on line {line_num}: '{line}'. Missing '='.")
+                    print(f"Error: Syntax error on line"
+                          f"{line_num}: '{line}'. Missing '='.")
                     sys.exit(1)
-                
+
                 key, value = line.split("=", 1)
                 key = key.strip().lower()
                 value = value.strip()
-                
+
                 if not key or not value:
-                    print(f"Error: Missing key or value on line {line_num}.")
+                    print(f"Error: Missing key or value"
+                          f"on line {line_num}.")
                     sys.exit(1)
-                
+
                 config[key] = value
-                
+
     except Exception as e:
         print(f"Error reading file: {e}")
         sys.exit(1)
-        
+
     return config
 
 
@@ -56,7 +54,7 @@ def config_checker(config: dict[str, Any]) -> None:
         and maze dimensions are logical.
     """
     man_keys = ["entry", "exit", "perfect", "width", "height", "output_file"]
-    
+
     for key in man_keys:
         if key not in config:
             print(f"Error: Missing mandatory key '{key}' in configuration.")
@@ -68,7 +66,7 @@ def config_checker(config: dict[str, Any]) -> None:
         if width <= 0 or height <= 0:
             print("Error: WIDTH and HEIGHT must be positive integers.")
             sys.exit(1)
-            
+
         coords_data = {}
         for key in ["entry", "exit"]:
             raw_val = config[key]
@@ -76,13 +74,14 @@ def config_checker(config: dict[str, Any]) -> None:
             if len(parts) != 2:
                 print(f"Error: {key.upper()} must be in 'x,y' format.")
                 sys.exit(1)
-            
+
             x, y = int(parts[0]), int(parts[1])
-            
+
             if not (0 <= x < width and 0 <= y < height):
-                print(f"Error: {key.upper()} ({x},{y}) is outside the maze bounds.")
+                print(f"Error: {key.upper()} ({x},{y})"
+                      f"is outside the maze bounds.")
                 sys.exit(1)
-            
+
             coords_data[key] = (x, y)
 
         if coords_data["entry"] == coords_data["exit"]:
@@ -250,13 +249,14 @@ class Maze:
         try:
             with open(file_name, "w") as f:
                 for row in self.grid:
-                    f.write("".join(hex(cell)[2:].upper() for cell in row) + "\n")
-                
+                    f.write(
+                        "".join(hex(cell)[2:].upper() for cell in row) + "\n")
+
                 f.write("\n")
 
                 f.write(f"{self.entry[0]} {self.entry[1]}\n")
                 f.write(f"{self.exitt[0]} {self.exitt[1]}\n")
-                
+
                 f.write(f"{self.solution_path}\n")
         except Exception as e:
             print(f"Error saving file: {e}")

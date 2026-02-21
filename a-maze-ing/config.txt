@@ -4,4 +4,4 @@ ENTRY=1,2
 EXIT =2,4
 OUTPUT_FILE=maze.txt
 PERFECT=False
-SEED = 32
+SEED = 23
