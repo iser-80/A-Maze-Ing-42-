@@ -10,6 +10,7 @@ it support colored and animated generation, path solving from entry to exit, and
 clone the repo and install the package locally
 `bash`
 `pip install .`
+`pip install dist/mazegen-1.0.0-py3-none-any.whl`
 `a-maze-ing config.txt`
 
 # Algorithem Used
